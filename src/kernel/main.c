@@ -14,19 +14,6 @@ void welcome(void);
 
 void os_init_cont(void);
 
-void stackoverflow(int x) {
-    if(x == 0)
-        printk("%d ",x);
-    if(x > 0)
-        stackoverflow(x - 1);
-}
-void keep_stackoverflow() {
-    while(1) {
-        stackoverflow(16384*1000);
-    }
-}
-
-
 void
 os_init(void) {
 	/* Notice that when we are here, IF is always 0 (see bootloader) */

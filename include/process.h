@@ -5,16 +5,17 @@
 #define KERNEL_PCB_MAX 64
 #define KSTACK_SIZE 4096
 
-typedef union PCB {
+typedef struct PCB {
+	void *tf;
 	uint8_t kstack[KSTACK_SIZE];
-	struct {
-		void *tf;
-		ListHead readyl, sleepl, freel;
-	};
+	ListHead list;
 }PCB;
+
 extern PCB *current;
 
 PCB* create_kthread(void *fun);
+void sleep(void);
+void wakeup(PCB *p);
 
 
 #endif

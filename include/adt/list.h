@@ -58,8 +58,20 @@ list_empty(ListHead *list) {
 	return list == list->next;
 }
 
+
+
 #define list_foreach(ptr, head) \
 	for ((ptr) = (head)->next; (ptr) != (head); (ptr) = (ptr)->next)
 
+
+static inline uint32_t
+list_size(ListHead *list) {
+	uint32_t size=0;
+	ListHead *tmp;
+	list_foreach(tmp, list) {
+		size++;
+	}
+	return size;
+}
 #endif
 

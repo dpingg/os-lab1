@@ -1,27 +1,27 @@
 #include "kernel.h"
 
-PCB *readyq, *freeq, *sleepq;
 PCB PCB_pool[KERNEL_PCB_MAX];
 
 /* from schedule.c */
 extern PCB idle;
-
+extern ListHead ready, block, free;
 
 /*接下来你需要实现内核线程的创建, 即实现函数PCB* create_kthread(void *fun), 
 它创建一个以fun为入口地址的线程, 初始化现场信息, 并返回其PCB. 你可以根据自己的需要添加函数的参数.*/
 
 PCB*
 create_kthread(void *fun) {
-	if (list_empty(&(freeq->freel))) {
+	if (list_empty(&free)) {
 		return NULL;
 	}
-	PCB *new_kthread = freeq;
+
+	PCB *new_kthread = list_entry(free.next, PCB, list);
+
 
 	/* delete the thread from free list, add it to the ready list */
-	freeq = (PCB *)freeq->freel.next;
-	list_del(&(new_kthread->freel));
-	list_add_after(&(current->readyl), &(new_kthread->readyl));
-	
+	list_del(free.next);
+	list_add_after(&ready, &new_kthread->list);
+
 
 	/* initialize the trap frame */
 	new_kthread->tf = (TrapFrame *)(new_kthread->kstack + KSTACK_SIZE) - 1;
@@ -32,6 +32,8 @@ create_kthread(void *fun) {
 	tf->gs = tf->fs = tf->es = tf->ds = SELECTOR_KERNEL(SEG_KERNEL_DATA);
 	tf->eflags = 0x202;  /* why */
 /*	*(new_kthread->kstack+KSTACK_SIZE-sizeof(TrapFrame) )=a; */
+
+
 	return new_kthread;
 
 }
@@ -59,26 +61,45 @@ void B () {
     }
 }
 
+
+void stackoverflow(int x) {
+    if(x == 0)
+        printk("%d ",x);
+    if(x > 0)
+        stackoverflow(x - 1);
+}
+void keep_stackoverflow() {
+    while(1) {
+        stackoverflow(16384*1000);
+    }
+}
+
+void sleep(void){
+
+}
+void wakeup(PCB *p){
+
+}
+
 void
 init_proc() {
-	readyq = &idle;
-	list_init(&(idle.readyl));
-	list_init(&(idle.sleepl));
-	list_init(&(idle.freel));
-	
-	freeq = &PCB_pool[0];
-	list_init(&(PCB_pool[0].readyl));
-	list_init(&(PCB_pool[0].sleepl));
-	list_init(&(PCB_pool[0].freel));
 
-	int i;
-	for (i=1; i < KERNEL_PCB_MAX; i++) {
-		list_init(&(PCB_pool[i].readyl));
-		list_init(&(PCB_pool[i].sleepl));
-		list_add_after(&(PCB_pool[i-1].freel), &(PCB_pool[i].freel));
+	list_init(&ready);
+	list_init(&block);
+	list_init(&free);
+
+
+	list_add_after(&ready, &idle.list);
+
+	int i=0;
+	for ( ; i < KERNEL_PCB_MAX; i++) {
+		list_add_after(&free, &(PCB_pool[i].list));
 	}
+
 	create_kthread(A);
 	create_kthread(B);
+
+
 /*	for(i = 0; i < 7; i ++) {
     	create_kthread(print_ch, 'a' + i);
 	} */

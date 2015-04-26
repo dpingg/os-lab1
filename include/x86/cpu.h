@@ -76,7 +76,7 @@ write_idtr(void *addr, uint32_t size) {
 	asm volatile("lidt (%0)" : : "r"(data));
 }
 
-/* write TR */
+/* write TR task register*/
 static inline void
 write_tr(uint16_t selector) {
 	asm volatile("ltr %0" : : "r"(selector));

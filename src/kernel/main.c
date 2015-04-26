@@ -1,6 +1,7 @@
 #include "common.h"
 #include "x86/x86.h"
 #include "memory.h"
+#include "kernel.h"
 
 
 void init_page(void);
@@ -12,6 +13,19 @@ void init_proc(void);
 void welcome(void);
 
 void os_init_cont(void);
+
+void stackoverflow(int x) {
+    if(x == 0)
+        printk("%d ",x);
+    if(x > 0)
+        stackoverflow(x - 1);
+}
+void keep_stackoverflow() {
+    while(1) {
+        stackoverflow(16384*1000);
+    }
+}
+
 
 void
 os_init(void) {
@@ -50,7 +64,10 @@ os_init_cont(void) {
 	/* Initialize processes. You should fill this. */
 	init_proc();
 
+
 	welcome();
+
+
 
 	sti();
 

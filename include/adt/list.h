@@ -73,5 +73,16 @@ list_size(ListHead *list) {
 	}
 	return size;
 }
+
+
+static inline bool
+list_exist(ListHead *list, ListHead *data) {
+	ListHead *tmp;
+	list_foreach(tmp, list) {
+		if(tmp==data) return true;
+	}
+	return false;
+}
+
 #endif
 

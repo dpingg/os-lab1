@@ -8,5 +8,4 @@ void printk(const char *ctl, ...);
 
 #include "assert.h"
 
-
 #endif

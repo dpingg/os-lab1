@@ -13,7 +13,10 @@ typedef struct PCB {
 
 extern PCB *current;
 
-PCB* create_kthread(void *fun);
+PCB* create_kthread(void *fun, ListHead *put);
+extern PCB idle;
+extern ListHead ready, block, free;
+
 void sleep(void);
 void wakeup(PCB *p);
 

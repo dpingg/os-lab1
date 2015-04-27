@@ -4,6 +4,7 @@
 #include "kernel.h"
 
 
+
 void init_page(void);
 void init_serial(void);
 void init_segment(void);
